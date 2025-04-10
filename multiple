@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# Colors
+GREEN="\e[32m"
+WHITE="\e[97m"
+RED="\e[31m"
+RESET="\e[0m"
+
+clear
+
+# Logo
+echo -e "${GREEN}"
+echo -e "  ##  ###  #######  ######   #######  #######  #######  ######   #######  ##  ##   #######  ###### "
+echo -e "  ### ###  ##   ##  ##  ##   ##       ##         ###    ##  ##     ###    ##  ##   ##       ##  ## "
+echo -e "  #######  ##   ##  ##  ##   ##       #######    ###    ##  ##     ###    ## ##    ##       ##  ## "
+echo -e "  ## ####  ##  ###  ### ###  #######       ##    ###    #######    ###    #######  #######  ####### "
+echo -e "  ##  ###  ##  ###  ### ###  ###      ###  ##    ###    ### ###    ###    ##  ###  ###      ### ### "
+echo -e "  ##  ###  ##  ###  ### ###  # #      ###  ##    ###    ### ###    ###    ##  ###  # #      ### ### "
+echo -e "  ##  ###  #######  #######  #######  #######    ###    ### ###  #######  ##  ###  #######  ### ### ${RESET}"
+
+# Menu
+echo -e "\n${WHITE}╔═══════════════════════════════╗${RESET}"
+echo -e "${WHITE}║       NODE CONTROL MENU       ║${RESET}"
+echo -e "${WHITE}╚═══════════════════════════════╝${RESET}\n"
+
+echo -e "🚀 1) Install and Start Node"
+echo -e "🔄 2) Update Node"
+echo -e "🧨 3) Remove Node"
+echo -e "❌ 0) Exit"
+read -p "Select an option: " choice
+
+if [ "$choice" == "1" ]; then
+  echo -e "${GREEN}Downloading and launching scripts...${RESET}"
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/install.sh -O install.sh
+  source ./install.sh
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/update.sh -O update.sh
+  source ./update.sh
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/start.sh -O start.sh
+  source ./start.sh
+
+  echo -e "\n${WHITE}Enter parameters for multiple-cli bind:${RESET}"
+  read -p "Download bandwidth: " bandwidth_download
+  read -p "Identifier: " identifier
+  read -p "PIN: " pin
+  read -p "Storage (GB): " storage
+  read -p "Upload bandwidth: " bandwidth_upload
+
+  echo -e "${GREEN}Binding node...${RESET}"
+  multiple-cli bind --bandwidth-download "$bandwidth_download" --identifier "$identifier" --pin "$pin" --storage "$storage" --bandwidth-upload "$bandwidth_upload"
+
+  echo -e "${GREEN}✅ Installation complete.${RESET}"
+
+elif [ "$choice" == "2" ]; then
+  echo -e "${GREEN}Updating node...${RESET}"
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/update.sh -O update.sh
+  source ./update.sh
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/start.sh -O start.sh
+  source ./start.sh
+
+  echo -e "${GREEN}✅ Update complete.${RESET}"
+
+elif [ "$choice" == "3" ]; then
+  echo -e "${RED}⚠️ WARNING: This will completely remove your node and all data!${RESET}"
+  read -p "Are you sure you want to continue? (y/n): " confirm
+  if [ "$confirm" == "y" ] || [ "$confirm" == "Y" ]; then
+    echo -e "${RED}Stopping processes and removing files...${RESET}"
+
+    pkill -f multiple || true
+    rm -rf ~/.multiple
+    rm -f /usr/local/bin/multiple-cli
+    rm -f install.sh update.sh start.sh
+
+    echo -e "${GREEN}🧹 Node successfully removed.${RESET}"
+  else
+    echo "Removal canceled."
+  fi
+
+elif [ "$choice" == "0" ]; then
+  echo "👋 Exiting..."
+  exit 0
+else
+  echo -e "${RED}❗ Invalid choice.${RESET}"
+  exit 1
+fi
