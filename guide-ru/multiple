@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# Цвета
+GREEN="\e[32m"
+WHITE="\e[97m"
+RED="\e[31m"
+RESET="\e[0m"
+
+clear
+
+# Логотип
+echo -e "${GREEN}"
+echo -e "  ##  ###  #######  ######   #######  #######  #######  ######   #######  ##  ##   #######  ###### "
+echo -e "  ### ###  ##   ##  ##  ##   ##       ##         ###    ##  ##     ###    ##  ##   ##       ##  ## "
+echo -e "  #######  ##   ##  ##  ##   ##       #######    ###    ##  ##     ###    ## ##    ##       ##  ## "
+echo -e "  ## ####  ##  ###  ### ###  #######       ##    ###    #######    ###    #######  #######  ####### "
+echo -e "  ##  ###  ##  ###  ### ###  ###      ###  ##    ###    ### ###    ###    ##  ###  ###      ### ### "
+echo -e "  ##  ###  ##  ###  ### ###  # #      ###  ##    ###    ### ###    ###    ##  ###  # #      ### ### "
+echo -e "  ##  ###  #######  #######  #######  #######    ###    ### ###  #######  ##  ###  #######  ### ### ${RESET}"
+
+# Меню
+echo -e "\n${WHITE}╔═══════════════════════════════╗${RESET}"
+echo -e "${WHITE}║       МЕНЮ УПРАВЛЕНИЯ УЗЛОМ   ║${RESET}"
+echo -e "${WHITE}╚═══════════════════════════════╝${RESET}\n"
+
+echo -e "🚀 1) Установить и запустить узел"
+echo -e "🔄 2) Обновить узел"
+echo -e "🧨 3) Удалить узел"
+echo -e "❌ 0) Выход"
+read -p "Выберите опцию: " choice
+
+if [ "$choice" == "1" ]; then
+  echo -e "${GREEN}Загрузка и запуск скриптов...${RESET}"
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/install.sh -O install.sh
+  source ./install.sh
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/update.sh -O update.sh
+  source ./update.sh
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/start.sh -O start.sh
+  source ./start.sh
+
+  echo -e "\n${WHITE}Введите параметры для multiple-cli bind:${RESET}"
+  read -p "Скорость загрузки (Download): " bandwidth_download
+  read -p "Идентификатор (Identifier): " identifier
+  read -p "PIN-код: " pin
+  read -p "Хранилище (GB): " storage
+  read -p "Скорость отдачи (Upload): " bandwidth_upload
+
+  echo -e "${GREEN}Привязка узла...${RESET}"
+  multiple-cli bind --bandwidth-download "$bandwidth_download" --identifier "$identifier" --pin "$pin" --storage "$storage" --bandwidth-upload "$bandwidth_upload"
+
+  echo -e "${GREEN}✅ Установка завершена.${RESET}"
+
+elif [ "$choice" == "2" ]; then
+  echo -e "${GREEN}Обновление узла...${RESET}"
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/update.sh -O update.sh
+  source ./update.sh
+
+  wget https://mdeck-download.s3.us-east-1.amazonaws.com/client/linux/start.sh -O start.sh
+  source ./start.sh
+
+  echo -e "${GREEN}✅ Обновление завершено.${RESET}"
+
+elif [ "$choice" == "3" ]; then
+  echo -e "${RED}⚠️ ВНИМАНИЕ: Это полностью удалит ваш узел и все данные!${RESET}"
+  read -p "Вы уверены, что хотите продолжить? (y/n): " confirm
+  if [ "$confirm" == "y" ] || [ "$confirm" == "Y" ]; then
+    echo -e "${RED}Остановка процессов и удаление файлов...${RESET}"
+
+    pkill -f multiple || true
+    rm -rf ~/.multiple
+    rm -f /usr/local/bin/multiple-cli
+    rm -f install.sh update.sh start.sh
+
+    echo -e "${GREEN}🧹 Узел успешно удалён.${RESET}"
+  else
+    echo "Удаление отменено."
+  fi
+
+elif [ "$choice" == "0" ]; then
+  echo "👋 Выход..."
+  exit 0
+else
+  echo -e "${RED}❗ Неверный выбор.${RESET}"
+  exit 1
+fi
