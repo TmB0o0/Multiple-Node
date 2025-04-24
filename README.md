@@ -18,5 +18,6 @@ sudo apt update && sudo apt upgrade -y
  ```bash
 curl -O https://raw.githubusercontent.com/TmB0o0/Multiple-Node/refs/heads/main/guide-en/multiple && chmod +x multiple && sudo ./multiple
 ```
+Get the identifying code here: https://www.app.multiple.cc/#/signup?inviteCode=hD1Zyero
 ## Choose your language: 🌍
 🇷🇺 [Russian Guide](guide-ru/README.md)
